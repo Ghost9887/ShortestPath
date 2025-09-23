@@ -14,3 +14,15 @@ void enqueue(PriorityQueue *pq, Cell *cell){
     return;
   }
 }
+
+void dequeue(PriorityQueue *pq){
+
+}
+
+int getSize(PriorityQueue *pq){
+ return pq->size;
+}
+
+void printQueue(PriorityQueue *pq){
+
+}
