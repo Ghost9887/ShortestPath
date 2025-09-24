@@ -1,15 +1,19 @@
 #include "cell.h"
 
-Cell createCell(int posX, int posY){
+bool playing = false;
+
+Cell createCell(int posX, int posY, int index){
   Cell cell;
   cell.pos = (Vector2){ posX, posY };
   cell.next = NULL;
   cell.colour = WHITE;
-  cell.start = INT_MAX;
+  cell.distance = 1;
   cell.weight = 1;
   cell.solid = false;
   cell.start = false;
   cell.end = false;
+  cell.visited = false;
+  cell.index = index;
   return cell;
 }
 
@@ -17,7 +21,7 @@ void initCellArr(Cell *cellArr){
   int index = 0;
   for(int y = 0; y < GRID_HEIGHT; y++){
     for(int x = 0; x < GRID_WIDTH; x++){
-      cellArr[index] = createCell(x * CELL_SIZE, y * CELL_SIZE);
+      cellArr[index] = createCell(x * CELL_SIZE, y * CELL_SIZE, index);
       index++;
     }
   }
@@ -46,9 +50,101 @@ void placeStart(Cell *cellArr, User *user){
   }
 }
 
+
+void drawCells(Cell *cellArr){
+  for(int i = 0; i < AMOUNT_OF_CELLS; i++){
+    DrawRectangle(cellArr[i].pos.x, cellArr[i].pos.y, CELL_SIZE, CELL_SIZE, cellArr[i].colour);
+    DrawText(TextFormat("%d", cellArr[i].index), cellArr[i].pos.x, cellArr[i].pos.y, 10, BLUE);
+  }
+}
+
+void checkNeighbours(int *cells, Cell *cellArr, int index){
+  // above
+  if(index - GRID_WIDTH >= 0 && index - GRID_WIDTH < AMOUNT_OF_CELLS && !cellArr[index - GRID_WIDTH].solid && !cellArr[index - GRID_WIDTH].visited){
+    cells[0] = index - GRID_WIDTH;
+  }else{
+    cells[0] = -1;
+  }
+
+  // left
+  if(index - 1 >= 0 && index - 1 < AMOUNT_OF_CELLS && !cellArr[index - 1].solid && !cellArr[index - 1].visited){
+    cells[3] = index - 1;
+  }else{
+    cells[3] = -1;
+  }
+
+  // below
+  if(index + GRID_WIDTH >= 0 && index + GRID_WIDTH < AMOUNT_OF_CELLS && !cellArr[index + GRID_WIDTH].solid && !cellArr[index + GRID_WIDTH].visited){
+    cells[2] = index + GRID_WIDTH;
+  }else{
+    cells[2] = -1;
+  }
+
+  // right
+  if(index + 1 >= 0 && index + 1 < AMOUNT_OF_CELLS && !cellArr[index + 1].solid && !cellArr[index + 1].visited){
+    cells[1] = index + 1;
+  }else{
+    cells[1] = -1;
+  }
+
+
+}
+
 void dijkstrasAlgo(Cell *cellArr){
+
+  //used for reconstructing the path
+  int *cameFrom = malloc(sizeof(int) * AMOUNT_OF_CELLS);
+
+  //find the start and end cells
+  Cell *start = NULL;
+  Cell *end = NULL;
+  for(int i = 0; i < AMOUNT_OF_CELLS; i++){
+    if(cellArr[i].start){
+      start = &cellArr[i];
+    }
+    else if(cellArr[i].end){
+      end = &cellArr[i];
+    }
+  }
+
+  //check if its valid
+  if(start == NULL || end == NULL){
+    printf("Invalid path given\n");
+    return;
+  }
+
   PriorityQueue pq = createPQ();
-  
+  enqueue(&pq, start);
+  start->visited = true;
+  cameFrom[start->index] = -1;
+  while(pq.size > 0){
+    if(pq.front->index == end->index){
+      break;
+    }
+   //find the neighbours
+    int *cells = malloc(sizeof(int) * 4); // 4 neighbours 
+    checkNeighbours(cells, cellArr, pq.front->index);
+    for(int i = 0; i < 4; i++){
+      if(cells[i] != -1){
+        cellArr[cells[i]].visited = true;
+        cameFrom[cells[i]] = pq.front->index;
+        enqueue(&pq, &cellArr[cells[i]]);
+      }
+    }
+    dequeue(&pq);
+    free(cells);
+  }
+
+  //reconstruct the path
+  int index = end->index;
+  while(index != start->index){
+    if(index != end->index && index != start->index){
+      cellArr[index].colour = ORANGE;
+    }
+    printf(" %d ->", index);
+    index = cameFrom[index];
+  }
+  free(cameFrom);
 }
 
 void aStarAlgo(Cell *cellArr){
@@ -96,9 +192,11 @@ void placeSolid(Cell *cellArr, User *user){
   }
 }
 
-void drawCells(Cell *cellArr){
-  for(int i = 0; i < AMOUNT_OF_CELLS; i++){
-    DrawRectangle(cellArr[i].pos.x, cellArr[i].pos.y, CELL_SIZE, CELL_SIZE, cellArr[i].colour);
+
+
+void callDijkstrasAlgo(Cell *cellArr){
+  if(IsKeyPressed(KEY_SPACE) && !playing){
+    dijkstrasAlgo(cellArr);
   }
 }
 
@@ -107,4 +205,5 @@ void updateCells(Cell *cellArr, User *user){
   placeStart(cellArr, user);
   placeEnd(cellArr, user);
   placeSolid(cellArr, user);
+  callDijkstrasAlgo(cellArr);
 }

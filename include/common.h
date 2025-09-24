@@ -11,7 +11,7 @@
 #define SCREEN_HEIGHT 800
 #define FPS 0
 
-#define CELL_SIZE 10
+#define CELL_SIZE 40
 
 #define GRID_WIDTH (SCREEN_WIDTH / CELL_SIZE)
 #define GRID_HEIGHT (SCREEN_HEIGHT / CELL_SIZE)
@@ -31,9 +31,11 @@ typedef struct Cell{
   Color colour;
   int weight;
   int distance;
+  int index;
   bool solid;
   bool start;
   bool end;
+  bool visited;
 }Cell;
 
 typedef struct User{
@@ -45,5 +47,6 @@ typedef struct PriorityQueue{
   Cell *rear;
   int size;
 }PriorityQueue;
+
 
 #endif

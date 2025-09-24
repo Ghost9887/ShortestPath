@@ -36,6 +36,7 @@ void enqueue(PriorityQueue *pq, Cell *cell){
   pq->size++;
 }
 
+
 void dequeue(PriorityQueue *pq){
   if(pq->front == NULL){
     return;
