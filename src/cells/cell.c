@@ -5,6 +5,7 @@ Cell createCell(int posX, int posY){
   cell.pos = (Vector2){ posX, posY };
   cell.next = NULL;
   cell.colour = WHITE;
+  cell.start = INT_MAX;
   cell.weight = 1;
   cell.solid = false;
   cell.start = false;
@@ -31,6 +32,7 @@ void placeStart(Cell *cellArr, User *user){
       if((int)cellArr[i].pos.x == posX && (int)cellArr[i].pos.y == posY && !cellArr[i].end && !cellArr[i].solid){
         cellArr[i].start = true;
         cellArr[i].colour = YELLOW;
+        cellArr[i].distance = 0;
       }
       else if(cellArr[i].end){
         continue;
@@ -38,9 +40,19 @@ void placeStart(Cell *cellArr, User *user){
       else{
         cellArr[i].start = false;
         cellArr[i].colour = WHITE;
+        cellArr[i].distance = INT_MAX;
       }
     }
   }
+}
+
+void dijkstrasAlgo(Cell *cellArr){
+  PriorityQueue pq = createPQ();
+  
+}
+
+void aStarAlgo(Cell *cellArr){
+
 }
 
 void placeEnd(Cell *cellArr, User *user){

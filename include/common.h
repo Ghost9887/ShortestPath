@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 800
@@ -29,6 +30,7 @@ typedef struct Cell{
   Vector2 pos;
   Color colour;
   int weight;
+  int distance;
   bool solid;
   bool start;
   bool end;
