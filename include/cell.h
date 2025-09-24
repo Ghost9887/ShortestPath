@@ -4,6 +4,6 @@
 #include "common.h"
 
   void initCellArr(Cell *cellArr);
-  void updateCells(Cell *cellArr);
+  void updateCells(Cell *cellArr, User *user);
 
 #endif

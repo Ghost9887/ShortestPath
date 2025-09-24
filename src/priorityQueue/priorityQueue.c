@@ -13,6 +13,7 @@ void enqueue(PriorityQueue *pq, Cell *cell){
     pq->front = pq->rear = cell;
     return;
   }
+
 }
 
 void dequeue(PriorityQueue *pq){

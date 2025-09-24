@@ -17,22 +17,26 @@
 
 #define AMOUNT_OF_CELLS (GRID_WIDTH * GRID_HEIGHT)
 
+typedef enum Mode{
+  START,
+  END,
+  SOLID
+}Mode;
+
 //act as our nodes
 typedef struct Cell{
   struct Cell *next;
   Vector2 pos;
   Color colour;
+  int weight;
+  bool solid;
+  bool start;
+  bool end;
 }Cell;
 
-typedef struct Start{
-  Vector2 pos;
-  Color colour;
-}Start;
-
-typedef struct End{
-  Vector2 pos;
-  Color colour;
-}End;
+typedef struct User{
+  Mode mode;
+}User;
 
 typedef struct PriorityQueue{
   Cell *front;
