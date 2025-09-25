@@ -1,6 +1,15 @@
 #include "cell.h"
 
-bool playing = false;
+PriorityQueue pq;
+bool initializedBFS;
+bool playingBFS;
+Cell *start = NULL;
+Cell *end = NULL;
+const float updateTime = 0.1f;
+float updateTimer = 0.0f;
+
+int *cameFrom;
+
 
 Cell createCell(int posX, int posY, int index){
   Cell cell;
@@ -85,65 +94,73 @@ void checkNeighbours(int *cells, Cell *cellArr, int index){
   }else{
     cells[1] = -1;
   }
-
-
 }
 
+
 void BFS(Cell *cellArr){
-
   //used for reconstructing the path
-  int *cameFrom = malloc(sizeof(int) * AMOUNT_OF_CELLS);
-
-  //find the start and end cells
-  Cell *start = NULL;
-  Cell *end = NULL;
-  for(int i = 0; i < AMOUNT_OF_CELLS; i++){
-    if(cellArr[i].start){
-      start = &cellArr[i];
-    }
-    else if(cellArr[i].end){
-      end = &cellArr[i];
+  if(pq.front->index == end->index){
+    playingBFS = false;
+  }
+  //find the neighbours
+  Cell *current = dequeue(&pq);
+  if(current != start && current != end){
+    current->colour = GREEN;
+  }
+  int *cells = malloc(sizeof(int) * 4); // 4 neighbours 
+  checkNeighbours(cells, cellArr, current->index);
+  for(int i = 0; i < 4; i++){
+    if(cells[i] != -1){
+      cellArr[cells[i]].visited = true;
+      cameFrom[cells[i]] = current->index;
+      enqueue(&pq, &cellArr[cells[i]]);
     }
   }
-
-  //check if its valid
-  if(start == NULL || end == NULL){
-    printf("Invalid path given\n");
-    return;
-  }
-
-  PriorityQueue pq = createPQ();
-  enqueue(&pq, start);
-  start->visited = true;
-  cameFrom[start->index] = -1;
-  while(pq.size > 0){
-    if(pq.front->index == end->index){
-      break;
+  free(cells);
+  if(getSize(&pq) <= 0 || !playingBFS){
+    playingBFS = false;
+    //reconstruct the path
+    int index = end->index;
+    while(index != start->index){
+      if(index != end->index && index != start->index){
+        cellArr[index].colour = ORANGE;
+      }
+      printf(" %d ->", index);
+      index = cameFrom[index];
     }
-   //find the neighbours
-    Cell *current = dequeue(&pq);
-    int *cells = malloc(sizeof(int) * 4); // 4 neighbours 
-    checkNeighbours(cells, cellArr, current->index);
-    for(int i = 0; i < 4; i++){
-      if(cells[i] != -1){
-        cellArr[cells[i]].visited = true;
-        cameFrom[cells[i]] = current->index;
-        enqueue(&pq, &cellArr[cells[i]]);
+    free(cameFrom);
+    printf("BFS Stopped\n");
+  }
+}
+
+void initializeBFS(Cell *cellArr){
+  if(!initializedBFS){
+    printf("BFS Started\n");
+    pq = createPQ();
+    cameFrom = malloc(sizeof(int) * AMOUNT_OF_CELLS);
+      //find the start and end cells
+    for(int i = 0; i < AMOUNT_OF_CELLS; i++){
+      if(cellArr[i].start){
+        start = &cellArr[i];
+      }
+      else if(cellArr[i].end){
+        end = &cellArr[i];
       }
     }
-    free(cells);
-  }
-
-  //reconstruct the path
-  int index = end->index;
-  while(index != start->index){
-    if(index != end->index && index != start->index){
-      cellArr[index].colour = ORANGE;
+    //check if its valid
+    if(start == NULL || end == NULL){
+      printf("Invalid path given\n");
+      return;
     }
-    printf(" %d ->", index);
-    index = cameFrom[index];
+    enqueue(&pq, start);
+    start->visited = true;
+    cameFrom[start->index] = -1;
+    initializedBFS = true;
+    playingBFS = true;
   }
-  free(cameFrom);
+  if(playingBFS){
+    BFS(cellArr);
+  }
 }
 
 void aStarAlgo(Cell *cellArr){
@@ -191,11 +208,9 @@ void placeSolid(Cell *cellArr, User *user){
   }
 }
 
-
-
 void callBFSAlgo(Cell *cellArr){
-  if(IsKeyPressed(KEY_SPACE) && !playing){
-    BFS(cellArr);
+  if(IsKeyPressed(KEY_SPACE) || playingBFS){
+    initializeBFS(cellArr);
   }
 }
 
@@ -204,5 +219,9 @@ void updateCells(Cell *cellArr, User *user){
   placeStart(cellArr, user);
   placeEnd(cellArr, user);
   placeSolid(cellArr, user);
-  callBFSAlgo(cellArr);
+  updateTimer += GetFrameTime();
+  if(updateTimer >= updateTime || !initializedBFS){
+    callBFSAlgo(cellArr);
+    updateTimer = 0.0f;
+  }
 }
