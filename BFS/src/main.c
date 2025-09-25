@@ -7,7 +7,7 @@ void updateGameState(Cell *cellArr, User *user);
 
 int main(){
 
-  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Shortest Path");
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BFS");
   SetTargetFPS(FPS);
 
   Cell *cellArr = (Cell*)malloc(sizeof(Cell) * AMOUNT_OF_CELLS);

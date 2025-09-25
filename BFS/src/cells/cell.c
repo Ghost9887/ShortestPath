@@ -5,7 +5,7 @@ bool initializedBFS;
 bool playingBFS;
 Cell *start = NULL;
 Cell *end = NULL;
-const float updateTime = 0.1f;
+const float updateTime = 0.05f;
 float updateTimer = 0.0f;
 
 int *parent;
