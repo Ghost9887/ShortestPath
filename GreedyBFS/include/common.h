@@ -38,4 +38,10 @@ typedef struct User{
   bool placedEnd;
 }User;
 
+typedef struct PriorityQueue{
+  Cell *front;
+  Cell *rear;
+  int size;
+}PriorityQueue;
+
 #endif

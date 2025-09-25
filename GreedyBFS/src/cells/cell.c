@@ -83,8 +83,21 @@ void deleteCell(Cell *cellArr, User *user){
   }
 }
 
+void initializeGreedyBFS(Cell *cellArr){
+  
+}
+
+void GreedyBFS(Cell *cellArr){
+
+}
+
+void callGreedyBFS(Cell *cellArr){
+
+}
+
 void updateCells(Cell *cellArr, User *user){
   drawCells(cellArr);
   placeCell(cellArr, user);
   deleteCell(cellArr, user);
+  callGreedyBFS(cellArr);
 }
