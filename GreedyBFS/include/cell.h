@@ -3,8 +3,7 @@
 
 #include "common.h"
 
-  Cell createCell(int posX, int posY, int id);
   void initCellArr(Cell *cellArr);
-  void updateCells(Cell *cellArr);
+  void updateCells(Cell *cellArr, User *user);
 
 #endif

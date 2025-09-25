@@ -34,6 +34,8 @@ typedef struct Cell{
 
 typedef struct User{
   Mode mode;
+  bool placedStart;
+  bool placedEnd;
 }User;
 
 #endif

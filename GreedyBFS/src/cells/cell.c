@@ -5,7 +5,7 @@ Cell createCell(int posX, int posY, int id){
   cell.id = id;
   cell.pos = (Vector2){ posX, posY };
   cell.next = NULL;
-  cell.start = true;
+  cell.start = false;
   cell.end = false;
   cell.solid = false;
   return cell;
@@ -38,6 +38,53 @@ void drawCells(Cell *cellArr){
   }
 }
 
-void updateCells(Cell *cellArr){
+void placeCell(Cell *cellArr, User *user){
+  if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+    Vector2 mousePos = GetMousePosition();
+    int posX = ((int)mousePos.x / CELL_SIZE) * CELL_SIZE;
+    int posY = ((int)mousePos.y / CELL_SIZE) * CELL_SIZE;
+    int index = (posY / CELL_SIZE) * GRID_WIDTH + (posX / CELL_SIZE);
+    if(user->mode == START){
+      if(!cellArr[index].solid && !cellArr[index].end && !user->placedStart){
+        cellArr[index].start = true;
+        user->placedStart = true;
+        printf("placed start cell: %d\n", index);
+      }
+    }
+    else if(user->mode == END){
+      if(!cellArr[index].solid && !cellArr[index].start && !user->placedEnd){
+        cellArr[index].end = true;
+        user->placedEnd = true;
+      }
+    }
+    else if(user->mode == SOLID){
+      if(!cellArr[index].start && !cellArr[index].end){
+        cellArr[index].solid = true;
+      }
+    }
+  }
+}
+
+void deleteCell(Cell *cellArr, User *user){
+  if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
+    Vector2 mousePos = GetMousePosition();
+    int posX = ((int)mousePos.x / CELL_SIZE) * CELL_SIZE;
+    int posY = ((int)mousePos.y / CELL_SIZE) * CELL_SIZE;
+    int index = (posY / CELL_SIZE) * GRID_WIDTH + (posX / CELL_SIZE);
+    if(cellArr[index].start){
+      user->placedStart = false;
+    }
+    if(cellArr[index].end){
+      user->placedEnd = false;
+    }
+    cellArr[index].start = false;
+    cellArr[index].end = false;
+    cellArr[index].solid = false;
+  }
+}
+
+void updateCells(Cell *cellArr, User *user){
   drawCells(cellArr);
+  placeCell(cellArr, user);
+  deleteCell(cellArr, user);
 }

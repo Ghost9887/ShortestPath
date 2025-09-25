@@ -4,6 +4,6 @@
 #include "common.h"
 
   User createUser();
-  void udpateUser();
+  void updateUser(User *user);
 
 #endif
