@@ -37,16 +37,18 @@ void enqueue(PriorityQueue *pq, Cell *cell){
 }
 
 
-void dequeue(PriorityQueue *pq){
+Cell *dequeue(PriorityQueue *pq){
   if(pq->front == NULL){
-    return;
+    return NULL;
   }
 
+  Cell *temp = pq->front;
   pq->front = pq->front->next;
   if(pq->front == NULL){
     pq->rear = NULL;
   }
   pq->size--;
+  return temp;
 }
 
 int peek(PriorityQueue *pq){

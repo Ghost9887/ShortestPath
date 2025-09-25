@@ -54,7 +54,6 @@ void placeStart(Cell *cellArr, User *user){
 void drawCells(Cell *cellArr){
   for(int i = 0; i < AMOUNT_OF_CELLS; i++){
     DrawRectangle(cellArr[i].pos.x, cellArr[i].pos.y, CELL_SIZE, CELL_SIZE, cellArr[i].colour);
-    DrawText(TextFormat("%d", cellArr[i].index), cellArr[i].pos.x, cellArr[i].pos.y, 10, BLUE);
   }
 }
 
@@ -90,7 +89,7 @@ void checkNeighbours(int *cells, Cell *cellArr, int index){
 
 }
 
-void dijkstrasAlgo(Cell *cellArr){
+void BFS(Cell *cellArr){
 
   //used for reconstructing the path
   int *cameFrom = malloc(sizeof(int) * AMOUNT_OF_CELLS);
@@ -122,16 +121,16 @@ void dijkstrasAlgo(Cell *cellArr){
       break;
     }
    //find the neighbours
+    Cell *current = dequeue(&pq);
     int *cells = malloc(sizeof(int) * 4); // 4 neighbours 
-    checkNeighbours(cells, cellArr, pq.front->index);
+    checkNeighbours(cells, cellArr, current->index);
     for(int i = 0; i < 4; i++){
       if(cells[i] != -1){
         cellArr[cells[i]].visited = true;
-        cameFrom[cells[i]] = pq.front->index;
+        cameFrom[cells[i]] = current->index;
         enqueue(&pq, &cellArr[cells[i]]);
       }
     }
-    dequeue(&pq);
     free(cells);
   }
 
@@ -194,9 +193,9 @@ void placeSolid(Cell *cellArr, User *user){
 
 
 
-void callDijkstrasAlgo(Cell *cellArr){
+void callBFSAlgo(Cell *cellArr){
   if(IsKeyPressed(KEY_SPACE) && !playing){
-    dijkstrasAlgo(cellArr);
+    BFS(cellArr);
   }
 }
 
@@ -205,5 +204,5 @@ void updateCells(Cell *cellArr, User *user){
   placeStart(cellArr, user);
   placeEnd(cellArr, user);
   placeSolid(cellArr, user);
-  callDijkstrasAlgo(cellArr);
+  callBFSAlgo(cellArr);
 }
