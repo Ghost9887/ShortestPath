@@ -8,7 +8,7 @@ Cell *end = NULL;
 const float updateTime = 0.1f;
 float updateTimer = 0.0f;
 
-int *cameFrom;
+int *parent;
 
 
 Cell createCell(int posX, int posY, int index){
@@ -67,38 +67,65 @@ void drawCells(Cell *cellArr){
 }
 
 void checkNeighbours(int *cells, Cell *cellArr, int index){
-  // above
-  if(index - GRID_WIDTH >= 0 && index - GRID_WIDTH < AMOUNT_OF_CELLS && !cellArr[index - GRID_WIDTH].solid && !cellArr[index - GRID_WIDTH].visited){
-    cells[0] = index - GRID_WIDTH;
+  // left
+  if(index - 1 >= 0 && index - 1 < AMOUNT_OF_CELLS && !cellArr[index - 1].solid && !cellArr[index - 1].visited){
+    cells[0] = index - 1;
   }else{
     cells[0] = -1;
   }
 
-  // left
-  if(index - 1 >= 0 && index - 1 < AMOUNT_OF_CELLS && !cellArr[index - 1].solid && !cellArr[index - 1].visited){
-    cells[3] = index - 1;
-  }else{
-    cells[3] = -1;
-  }
-
   // below
   if(index + GRID_WIDTH >= 0 && index + GRID_WIDTH < AMOUNT_OF_CELLS && !cellArr[index + GRID_WIDTH].solid && !cellArr[index + GRID_WIDTH].visited){
-    cells[2] = index + GRID_WIDTH;
+    cells[1] = index + GRID_WIDTH;
   }else{
-    cells[2] = -1;
+    cells[1] = -1;
   }
 
   // right
   if(index + 1 >= 0 && index + 1 < AMOUNT_OF_CELLS && !cellArr[index + 1].solid && !cellArr[index + 1].visited){
-    cells[1] = index + 1;
+    cells[2] = index + 1;
   }else{
-    cells[1] = -1;
+    cells[2] = -1;
   }
+
+    // above
+  if(index - GRID_WIDTH >= 0 && index - GRID_WIDTH < AMOUNT_OF_CELLS && !cellArr[index - GRID_WIDTH].solid && !cellArr[index - GRID_WIDTH].visited){
+    cells[3] = index - GRID_WIDTH;
+  }else{
+    cells[3] = -1;
+  }
+  //top left
+  if(index - GRID_WIDTH - 1 >= 0 && index - GRID_WIDTH - 1 < AMOUNT_OF_CELLS && !cellArr[index - GRID_WIDTH - 1].solid && !cellArr[index - GRID_WIDTH - 1].visited){
+    cells[4] = index - GRID_WIDTH - 1;
+  }else{
+    cells[4] = -1;
+  }
+
+  //top right
+  if(index - GRID_WIDTH + 1 >= 0 && index - GRID_WIDTH + 1 < AMOUNT_OF_CELLS && !cellArr[index - GRID_WIDTH + 1].solid && !cellArr[index - GRID_WIDTH + 1].visited){
+    cells[5] = index - GRID_WIDTH + 1;
+  }else{
+    cells[5] = -1;
+  }
+
+  //bottom right
+  if(index + GRID_WIDTH + 1 >= 0 && index + GRID_WIDTH + 1 < AMOUNT_OF_CELLS && !cellArr[index + GRID_WIDTH + 1].solid && !cellArr[index + GRID_WIDTH + 1].visited){
+    cells[6] = index + GRID_WIDTH + 1;
+  }else{
+    cells[6] = -1;
+  }
+
+  //bottom left
+  if(index + GRID_WIDTH - 1 >= 0 && index + GRID_WIDTH - 1 < AMOUNT_OF_CELLS && !cellArr[index + GRID_WIDTH - 1].solid && !cellArr[index + GRID_WIDTH - 1].visited){
+    cells[7] = index + GRID_WIDTH - 1;
+  }else{
+    cells[7] = -1;
+  }
+
 }
 
 
 void BFS(Cell *cellArr){
-  //used for reconstructing the path
   if(pq.front->index == end->index){
     playingBFS = false;
   }
@@ -107,28 +134,25 @@ void BFS(Cell *cellArr){
   if(current != start && current != end){
     current->colour = GREEN;
   }
-  int *cells = malloc(sizeof(int) * 4); // 4 neighbours 
+  int *cells = malloc(sizeof(int) * 8); 
   checkNeighbours(cells, cellArr, current->index);
-  for(int i = 0; i < 4; i++){
+  for(int i = 0; i < 8; i++){
     if(cells[i] != -1){
       cellArr[cells[i]].visited = true;
-      cameFrom[cells[i]] = current->index;
       enqueue(&pq, &cellArr[cells[i]]);
+      parent[cells[i]] = current->index;
     }
   }
   free(cells);
   if(getSize(&pq) <= 0 || !playingBFS){
     playingBFS = false;
     //reconstruct the path
-    int index = end->index;
-    while(index != start->index){
-      if(index != end->index && index != start->index){
-        cellArr[index].colour = ORANGE;
-      }
-      printf(" %d ->", index);
-      index = cameFrom[index];
+    int currentIndex = end->index;
+    while(currentIndex != -1 && currentIndex != start->index){
+      cellArr[currentIndex].colour = ORANGE;
+      currentIndex = parent[currentIndex];
     }
-    free(cameFrom);
+    free(parent);
     printf("BFS Stopped\n");
   }
 }
@@ -136,8 +160,11 @@ void BFS(Cell *cellArr){
 void initializeBFS(Cell *cellArr){
   if(!initializedBFS){
     printf("BFS Started\n");
+    parent = malloc(sizeof(int) * AMOUNT_OF_CELLS);
+    for(int i = 0; i < AMOUNT_OF_CELLS; i++){
+      parent[i] = -1; // no parent
+    }
     pq = createPQ();
-    cameFrom = malloc(sizeof(int) * AMOUNT_OF_CELLS);
       //find the start and end cells
     for(int i = 0; i < AMOUNT_OF_CELLS; i++){
       if(cellArr[i].start){
@@ -154,7 +181,7 @@ void initializeBFS(Cell *cellArr){
     }
     enqueue(&pq, start);
     start->visited = true;
-    cameFrom[start->index] = -1;
+    parent[start->index] = start->index;
     initializedBFS = true;
     playingBFS = true;
   }
