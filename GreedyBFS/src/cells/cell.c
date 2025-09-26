@@ -7,6 +7,8 @@ Cell *end;
 bool initialized = false;
 bool running = false;
 
+int *cameFrom;
+
 Cell createCell(int posX, int posY, int id){
   Cell cell;
   cell.id = id;
@@ -16,6 +18,7 @@ Cell createCell(int posX, int posY, int id){
   cell.end = false;
   cell.solid = false;
   cell.visited = false;
+  cell.path = false;
   cell.distance = INT_MAX;
   return cell;
 }
@@ -41,10 +44,11 @@ void drawCells(Cell *cellArr){
     else if(cellArr[i].solid){
       DrawRectangle(cellArr[i].pos.x, cellArr[i].pos.y, CELL_SIZE, CELL_SIZE, BLUE);
     }
-    else if(cellArr[i].visited){
-      DrawRectangle(cellArr[i].pos.x, cellArr[i].pos.y, CELL_SIZE, CELL_SIZE, GREEN);
+    else if(cellArr[i].visited || cellArr[i].path){
+      if(cellArr[i].visited) DrawRectangle(cellArr[i].pos.x, cellArr[i].pos.y, CELL_SIZE, CELL_SIZE, GREEN);
+      if(cellArr[i].path) DrawRectangle(cellArr[i].pos.x, cellArr[i].pos.y, CELL_SIZE, CELL_SIZE, PURPLE);
     }
-    else{
+   else{
       DrawRectangle(cellArr[i].pos.x, cellArr[i].pos.y, CELL_SIZE, CELL_SIZE, WHITE);
     }
   }
@@ -163,13 +167,21 @@ int *checkNeighbours(Cell *cellArr, int index){
 
 void GreedyBFS(Cell *cellArr){
   if(pq.front->id == end->id){
+    //reconstruct path
+    int current = end->id;
+    while(current != start->id){
+      cellArr[cameFrom[current]].path = true;
+      current = cameFrom[current];
+    }
     running = false;
+    free(cameFrom);
     return;
   }
   Cell *current = dequeue(&pq);
   int *cells = checkNeighbours(cellArr, current->id);
   for(int i = 0; i < 8; i++){
     if(cells[i] > -1){
+      cameFrom[cells[i]] = current->id;
       cellArr[cells[i]].visited = true;
       cellArr[cells[i]].distance = heuristic(&cellArr[cells[i]]);
       enqueue(&pq, &cellArr[cells[i]]);
@@ -181,7 +193,7 @@ void GreedyBFS(Cell *cellArr){
 void initializeGreedyBFS(Cell *cellArr){
   if(!initialized){
     pq = createPQ();
-  
+    cameFrom = malloc(sizeof(int) * AMOUNT_OF_CELLS);
     for(int i = 0; i < AMOUNT_OF_CELLS; i++){
       if(cellArr[i].start){
         start = &cellArr[i];
@@ -196,6 +208,7 @@ void initializeGreedyBFS(Cell *cellArr){
     }
     start->visited = true;
     start->distance = heuristic(start);
+    cameFrom[start->id] = start->id;
     enqueue(&pq, start);
     running = true;
     initialized = true;

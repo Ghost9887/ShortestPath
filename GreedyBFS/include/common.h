@@ -32,6 +32,7 @@ typedef struct Cell{
   bool end;
   bool solid;
   bool visited;
+  bool path;
   float distance;
 }Cell;
 
