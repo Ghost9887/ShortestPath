@@ -23,13 +23,13 @@ void switchModes(User *user){
 void drawUserMode(User *user){ 
   switch(user->mode){
     case START:
-      DrawText("Start", SCREEN_WIDTH - 100, 30, 20, PURPLE);
+      DrawText("Start", SCREEN_WIDTH - 100, 30, 30, PURPLE);
       break;
     case END:
-      DrawText("End", SCREEN_WIDTH - 100, 30, 20, PURPLE);
+      DrawText("End", SCREEN_WIDTH - 100, 30, 30, PURPLE);
       break;
     case SOLID:
-      DrawText("Solid", SCREEN_WIDTH - 100, 30, 20, PURPLE);
+      DrawText("Solid", SCREEN_WIDTH - 100, 30, 30, PURPLE);
       break;
     default:
       break;
