@@ -7,7 +7,7 @@ void updateGameState(Cell *cellArr, User *user);
 
 int main(){
 
-  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Greedy BFS");
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BFS");
   SetTargetFPS(FPS);
 
   Cell *cellArr = malloc(sizeof(Cell) * AMOUNT_OF_CELLS);
