@@ -5,6 +5,7 @@ PriorityQueue createPQ(){
   pq.front = NULL;
   pq.rear = NULL;
   pq.size = 0;
+  return pq;
 }
 
 void enqueue(PriorityQueue *pq, Cell *cell){
@@ -13,7 +14,6 @@ void enqueue(PriorityQueue *pq, Cell *cell){
     pq->size++;
     return;
   }
-
   if(cell->distance < pq->front->distance){
     cell->next = pq->front;
     pq->front = cell;

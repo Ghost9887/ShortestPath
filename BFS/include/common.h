@@ -4,6 +4,7 @@
 #include "raylib.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 #include <stdlib.h>
 #include <limits.h>
 
@@ -11,8 +12,7 @@
 #define SCREEN_HEIGHT 800
 #define FPS 0
 
-#define CELL_SIZE 40
-
+#define CELL_SIZE 30
 #define GRID_WIDTH (SCREEN_WIDTH / CELL_SIZE)
 #define GRID_HEIGHT (SCREEN_HEIGHT / CELL_SIZE)
 
@@ -24,20 +24,21 @@ typedef enum Mode{
   SOLID
 }Mode;
 
-//act as our nodes
 typedef struct Cell{
   int id;
-  struct Cell *next;
   Vector2 pos;
-  Color colour;
-  bool solid;
+  struct Cell *next;
   bool start;
   bool end;
+  bool solid;
   bool visited;
+  bool path;
 }Cell;
 
 typedef struct User{
   Mode mode;
+  bool placedStart;
+  bool placedEnd;
 }User;
 
 typedef struct Queue{
@@ -45,6 +46,5 @@ typedef struct Queue{
   Cell *rear;
   int size;
 }Queue;
-
 
 #endif

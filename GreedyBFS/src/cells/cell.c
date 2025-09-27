@@ -64,7 +64,6 @@ void placeCell(Cell *cellArr, User *user){
       if(!cellArr[index].solid && !cellArr[index].end && !user->placedStart){
         cellArr[index].start = true;
         user->placedStart = true;
-        printf("placed start cell: %d\n", index);
       }
     }
     else if(user->mode == END){
@@ -203,7 +202,6 @@ void initializeGreedyBFS(Cell *cellArr){
       }
     }
     if(start == NULL || end == NULL){
-      printf("Invalid path\n");
       return;
     }
     start->visited = true;

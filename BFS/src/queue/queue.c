@@ -9,41 +9,32 @@ Queue createQ(){
 }
 
 void enqueue(Queue *q, Cell *cell){
-  if(q->front == NULL){
+  if(q->size == 0){
     q->front = q->rear = cell;
     q->size++;
     return;
   }
 
-  Cell *temp = q->front;
-  while(temp->next != NULL){
-    temp = temp->next;
+  Cell *current = q->front;
+  while(current->next != NULL){
+    current = current->next;
   }
-
-  cell->next = temp->next;
-  temp->next = cell;
-
-  if(cell->next == NULL){
-    q->rear = cell;
-  }
+  cell->next = current->next;
+  current->next = cell;
+  if(cell->next == NULL) q->rear = cell;
   q->size++;
 }
 
-
 Cell *dequeue(Queue *q){
-  if(q->front == NULL){
+  if(q->size == 0){
     return NULL;
   }
-
-  Cell *temp = q->front;
+  Cell *front = q->front;
   q->front = q->front->next;
-  if(q->front == NULL){
-    q->rear = NULL;
-  }
   q->size--;
-  return temp;
+  return front;
 }
 
 int getSize(Queue *q){
- return q->size;
+  return q->size;
 }

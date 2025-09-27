@@ -7,30 +7,27 @@ void updateGameState(Cell *cellArr, User *user);
 
 int main(){
 
-  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BFS");
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Greedy BFS");
   SetTargetFPS(FPS);
 
-  Cell *cellArr = (Cell*)malloc(sizeof(Cell) * AMOUNT_OF_CELLS);
+  Cell *cellArr = malloc(sizeof(Cell) * AMOUNT_OF_CELLS);
   initCellArr(cellArr);
-
+  
   User user = createUser();
 
   while(!WindowShouldClose()){
-    
+  
     BeginDrawing();
 
-      ClearBackground(WHITE);
+      ClearBackground(WHITE); 
 
       updateGameState(cellArr, &user);
 
     EndDrawing();
 
   }
-  
-  free(cellArr);
 
   CloseWindow();
-
   return 0;
 }
 

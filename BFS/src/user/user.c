@@ -3,10 +3,12 @@
 User createUser(){
   User user;
   user.mode = START;
+  user.placedStart = false;
+  user.placedEnd = false;
   return user;
 }
 
-void changeMode(User *user){
+void switchModes(User *user){
   if(IsKeyPressed(KEY_ONE)){
     user->mode = START;
   }
@@ -18,19 +20,23 @@ void changeMode(User *user){
   }
 }
 
-void drawMode(User *user){
-  if(user->mode == START){
-    DrawText("Start", SCREEN_WIDTH - 100, 30, 30, PURPLE);
-  }
-  else if(user->mode == END){
-    DrawText("End", SCREEN_WIDTH - 100, 30, 30, PURPLE);
-  }
-  else if(user->mode == SOLID){
-    DrawText("Solid", SCREEN_WIDTH - 100, 30, 30, PURPLE);
+void drawUserMode(User *user){ 
+  switch(user->mode){
+    case START:
+      DrawText("Start", SCREEN_WIDTH - 100, 30, 30, PURPLE);
+      break;
+    case END:
+      DrawText("End", SCREEN_WIDTH - 100, 30, 30, PURPLE);
+      break;
+    case SOLID:
+      DrawText("Solid", SCREEN_WIDTH - 100, 30, 30, PURPLE);
+      break;
+    default:
+      break;
   }
 }
 
 void updateUser(User *user){
-  drawMode(user);
-  changeMode(user);
+  switchModes(user);
+  drawUserMode(user);
 }
