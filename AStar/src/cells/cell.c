@@ -164,62 +164,61 @@ int *checkNeighbours(Cell *cellArr, int index){
   return cells;
 }
 
-float heuristic(Cell *cell){
-  return (fabs(cell->pos.x - end->pos.x) + fabs(cell->pos.y - end->pos.y));
+float heuristic(Cell *a, Cell *b){
+  return fabs(a->pos.x - b->pos.x) + fabs(a->pos.y - b->pos.y); // Manhattan
 }
 
 void AStar(Cell *cellArr){
-  if(pq.front->id == end->id){
-    //reconstruct path
-    int current = end->id;
-    while(current != start->id){
-      cellArr[cameFrom[current]].path = true;
-      current = cameFrom[current];
+  if (pq.front == NULL) return;
+  Cell *current = dequeue(&pq);
+  if (current->id == end->id){
+    int curr = end->id;
+    while (curr != start->id){
+      cellArr[curr].path = true;
+      curr = cameFrom[curr];
     }
     running = false;
     free(cameFrom);
     return;
   }
-  Cell *current = dequeue(&pq);
-  int *cells = checkNeighbours(cellArr, current->id);
-  for(int i = 0; i < 8; i++){
-    if(cells[i] > -1){
-      cameFrom[cells[i]] = current->id;
-      cellArr[cells[i]].visited = true;
-      cellArr[cells[i]].total = cellArr[cells[i]].weight + (float)heuristic(&cellArr[cells[i]]);
-      enqueue(&pq, &cellArr[cells[i]]);
-    } 
+  int *neighbors = checkNeighbours(cellArr, current->id);
+  for (int i = 0; i < 8; i++){
+    int nid = neighbors[i];
+    if (nid == -1 || cellArr[nid].solid) continue;
+      float tentativeGScore = cellArr[current->id].distance + cellArr[nid].weight;
+      if (!cellArr[nid].visited || tentativeGScore < cellArr[nid].distance){
+        cameFrom[nid] = current->id;
+        cellArr[nid].distance = tentativeGScore;
+        cellArr[nid].total = tentativeGScore + heuristic(&cellArr[nid], end);
+        cellArr[nid].visited = true;
+        enqueue(&pq, &cellArr[nid]);
+      }
   }
-  free(cells);
+  free(neighbors);
 }
 
 void initializeAStar(Cell *cellArr){
   if(!initialized){
     pq = createPQ();
     cameFrom = malloc(sizeof(int) * AMOUNT_OF_CELLS);
-    for(int i = 0; i < AMOUNT_OF_CELLS; i++){
-      if(cellArr[i].start){
-        start = &cellArr[i];
-      }
-      else if(cellArr[i].end){
-        end = &cellArr[i];
-      }
+    for (int i = 0; i < AMOUNT_OF_CELLS; i++){
+      cellArr[i].distance = INT_MAX;
+      cellArr[i].total = INT_MAX;
+      if (cellArr[i].start) start = &cellArr[i];
+      else if (cellArr[i].end) end = &cellArr[i];
     }
-    if(start == NULL || end == NULL){
-      return;
+    if (!start || !end) return;
+      start->distance = 0;
+      start->total = heuristic(start, end);
+      cameFrom[start->id] = start->id;
+      enqueue(&pq, start);
+      running = true;
+      initialized = true;
     }
-    start->visited = true;
-    cameFrom[start->id] = start->id;
-
-    enqueue(&pq, start);
-    running = true;
-    initialized = true;
-  }
-  if(running){
-    AStar(cellArr);
-  }
+    if(running){
+      AStar(cellArr);
+    }
 }
-
 void callAStar(Cell *cellArr){
   if(IsKeyPressed(KEY_SPACE) || running){
     initializeAStar(cellArr);
